@@ -14,7 +14,26 @@ function generateOrbitPoints(radius, steps = 60,
     });
   }
   return points;
-}
+} /* generateOrbitPoints() */
+
+function generateEpicyclePoints(R, r, steps = 60,
+                                cx = 200, cy = 200,
+                                k = 1) {
+  const points = [];
+  for (let i = 0; i < steps; i++) {
+    const θ = (i / steps) * 2 * Math.PI;
+    /* center of the deferent */
+    const x0 = cx + R * Math.cos(θ);
+    const y0 = cy + R * Math.sin(θ);
+    /* epicycle angle: negative k * θ for loop */
+    const φ = -k * θ;
+    points.push({
+      x: x0 + r * Math.cos(φ),
+      y: y0 + r * Math.sin(φ),
+    });
+  }
+  return points;
+} /* generateEpicyclePoints() */
 
 function App() {
   const svgRef = useRef(null);
@@ -37,6 +56,20 @@ function App() {
         .attr('cy', d => d.y)
         .attr('r', 3)
         .attr('fill', 'steelblue');
+    
+    /* generate epicycle points (e.g. R=100, r=30, k=1)... */
+
+    const epi = generateEpicyclePoints(100, 30);
+
+    svg
+      .selectAll('.ecpicycle')
+      .data(epi)
+      .join('circle')
+        .attr('class', 'epicycle')
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .attr('r', 2)
+        .attr('fill', 'tomato');
   }, [])
 
   useEffect(() => {
